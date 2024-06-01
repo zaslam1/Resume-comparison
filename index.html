@@ -4,7 +4,6 @@
     <title>Job Description and Resume Comparison</title>
     <script>
         let step = 1;
-
         async function proceed() {
             if (step === 1) {
                 const jobDescription = document.getElementById('job_description').value;
@@ -15,7 +14,6 @@
                     },
                     body: JSON.stringify({ job_description: jobDescription })
                 });
-
                 if (response.ok) {
                     document.getElementById('job_description_section').style.display = 'none';
                     document.getElementById('resume_section').style.display = 'block';
