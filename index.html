@@ -6,16 +6,26 @@
 <body>
     <h1>Upload Job Description and Resume</h1>
     
-    <form id="job-description-form" enctype="multipart/form-data">
-        <label for="job-description">Job Description:</label>
-        <input type="file" id="job-description" name="file" accept=".txt,.pdf,.doc,.docx" required>
-        <button type="submit">Upload Job Description</button>
+    <h2>Job Description</h2>
+    <form id="job-description-form">
+        <label for="jd-file">Upload Job Description File:</label>
+        <input type="file" id="jd-file" name="jd-file" accept=".txt,.pdf,.doc,.docx">
+        <br><br>
+        <label for="jd-text">Or Paste Job Description Text:</label>
+        <textarea id="jd-text" name="jd-text" rows="10" cols="50"></textarea>
+        <br><br>
+        <button type="submit">Submit Job Description</button>
     </form>
     
-    <form id="resume-form" enctype="multipart/form-data" style="display:none;">
-        <label for="resume">Resume:</label>
-        <input type="file" id="resume" name="file" accept=".txt,.pdf,.doc,.docx" required>
-        <button type="submit">Upload Resume</button>
+    <h2>Resume</h2>
+    <form id="resume-form" style="display:none;">
+        <label for="resume-file">Upload Resume File:</label>
+        <input type="file" id="resume-file" name="resume-file" accept=".txt,.pdf,.doc,.docx">
+        <br><br>
+        <label for="resume-text">Or Paste Resume Text:</label>
+        <textarea id="resume-text" name="resume-text" rows="10" cols="50"></textarea>
+        <br><br>
+        <button type="submit">Submit Resume</button>
     </form>
     
     <div id="results" style="display:none;">
@@ -32,7 +42,20 @@
 
         jobDescriptionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(jobDescriptionForm);
+            const formData = new FormData();
+            
+            const jdFile = document.getElementById('jd-file').files[0];
+            const jdText = document.getElementById('jd-text').value;
+
+            if (jdFile) {
+                formData.append('file', jdFile);
+            } else if (jdText) {
+                formData.append('text', jdText);
+            } else {
+                alert("Please provide either a job description file or text.");
+                return;
+            }
+
             const response = await fetch('https://aaf3-34-145-136-52.ngrok-free.app/upload_job_description', {
                 method: 'POST',
                 body: formData
@@ -48,8 +71,21 @@
 
         resumeForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(resumeForm);
-            const response = await fetch('YOUR_NGROK_URL/upload_resume', {
+            const formData = new FormData();
+            
+            const resumeFile = document.getElementById('resume-file').files[0];
+            const resumeText = document.getElementById('resume-text').value;
+
+            if (resumeFile) {
+                formData.append('file', resumeFile);
+            } else if (resumeText) {
+                formData.append('text', resumeText);
+            } else {
+                alert("Please provide either a resume file or text.");
+                return;
+            }
+
+            const response = await fetch('https://aaf3-34-145-136-52.ngrok-free.app/upload_resume', {
                 method: 'POST',
                 body: formData
             });
