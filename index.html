@@ -1,37 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Resume Comparison</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Description and Resume Matching</title>
 </head>
 <body>
-    <h1>Resume Comparison Tool</h1>
-    <!-- Add input fields for job description and resume -->
-    <form>
-        <label for="jobDescription">Job Description:</label>
-        <textarea id="jobDescription" rows="4" cols="50"></textarea>
-        <br>
-        <label for="resume">Resume:</label>
-        <input type="file" id="resume" accept=".doc, .pdf, .txt">
-        <!-- Add a submit button -->
-        <input type="submit" value="Compare Resumes">
+    <h1>Job Description and Resume Matching</h1>
+    <form id="jdForm">
+        <label for="jobDescription">Enter Job Description:</label><br>
+        <textarea id="jobDescription" name="jobDescription" rows="10" cols="50"></textarea><br>
+        <button type="submit">Submit Job Description</button>
     </form>
-    <!-- Display results here -->
-    <div id="results"></div>
+
+    <form id="resumeForm" style="display:none;">
+        <label for="resume">Enter Resume:</label><br>
+        <textarea id="resume" name="resume" rows="10" cols="50"></textarea><br>
+        <button type="submit">Submit Resume</button>
+    </form>
+
+    <div id="results" style="display:none;">
+        <h2>Results</h2>
+        <p id="similarityScore"></p>
+        <p id="interpretation"></p>
+        <p id="recommendations"></p>
+    </div>
+
+    <script>
+        document.getElementById('jdForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const jobDescription = document.getElementById('jobDescription').value;
+            
+            // Send job description to Colab
+            const response = await fetch('YOUR_COLAB_URL_FOR_JOB_DESCRIPTION', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ jobDescription })
+            });
+            
+            if (response.ok) {
+                document.getElementById('jdForm').style.display = 'none';
+                document.getElementById('resumeForm').style.display = 'block';
+            } else {
+                alert('Error submitting job description');
+            }
+        });
+
+        document.getElementById('resumeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const resume = document.getElementById('resume').value;
+
+            // Send resume to Colab
+            const response = await fetch('YOUR_COLAB_URL_FOR_RESUME', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ resume })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('resumeForm').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('similarityScore').textContent = `Resume Similarity Score: ${data.similarity_score}`;
+                document.getElementById('interpretation').textContent = data.interpretation;
+                document.getElementById('recommendations').textContent = data.recommendations;
+            } else {
+                alert('Error submitting resume');
+            }
+        });
+    </script>
 </body>
 </html>
-<script>
-    document.querySelector('form').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const jobDescription = document.getElementById('jobDescription').value;
-        const response = await fetch('/compare', {
-            method: 'POST',
-            body: new URLSearchParams({ job_description: jobDescription }),
-        });
-        const data = await response.json();
-        document.getElementById('results').innerHTML = `
-            <p>Resume Similarity Score: ${data.similarity_score}</p>
-            <p>${data.interpretation}</p>
-            <p>${data.recommendations}</p>
-        `;
-    });
-</script>
